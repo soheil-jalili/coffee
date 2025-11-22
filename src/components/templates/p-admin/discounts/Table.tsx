@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { showSwal } from "@/utils/helpers";
 import mongoose from "mongoose";
 import DiscountType from "@/types/discount-type";
+
 export default function DataTable({
   discounts,
   title,
@@ -13,8 +14,6 @@ export default function DataTable({
   title: string;
 }) {
   const router = useRouter();
-
-  console.log(discounts);
 
   const deleteDiscountCode = async (_id: mongoose.Types.ObjectId) => {
     const res = await showSwal(
@@ -55,26 +54,33 @@ export default function DataTable({
               <th>شناسه</th>
               <th>کد تخفیف</th>
               <th>درصد تخفیف</th>
-              <th>ماکسیموم استفاده</th>
-              <th>استفاده شده</th>
+              <th>حداکثر استفاده</th>
+              <th>دفعات استفاده شده</th>
+              <th>سازنده</th>
               <th>محصول</th>
               <th>حذف</th>
             </tr>
           </thead>
           <tbody>
             {discounts.map((discount: DiscountType, index) => (
-              <tr key={discount._id.toString()}>
+              <tr
+                key={discount._id.toString()}
+                className={
+                  discount.uses === discount.maxUse ? styles.finish_use : ""
+                }
+              >
                 <td>{index + 1}</td>
                 <td>{discount.code}</td>
                 <td>{discount.percent}</td>
                 <td>{discount.maxUse}</td>
                 <td>{discount.uses}</td>
+                <td>{discount.user.name}</td>
                 <td>
                   {discount.product === null
                     ? "همه محصولات"
                     : discount.product.name}
                 </td>
-                <td>
+                <td id="delete__item">
                   <button
                     type="button"
                     className={styles.delete_btn}

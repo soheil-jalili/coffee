@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 require("./Product");
+require("./User");
 
 const schema = mongoose.Schema(
   {
@@ -24,6 +25,11 @@ const schema = mongoose.Schema(
       type: mongoose.Types.ObjectId,
       required: false,
       ref: "Product",
+    },
+    user: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "User",
     },
   },
   {

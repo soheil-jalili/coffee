@@ -73,6 +73,7 @@ export const POST = async (request: NextRequest) => {
       percent,
       maxUse,
       product: product || null,
+      user,
     });
 
     return Response.json({ message: "Discount created!" }, { status: 201 });
