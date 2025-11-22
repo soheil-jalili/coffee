@@ -3,7 +3,7 @@ import Link from "next/link";
 import styles from "./table.module.css";
 import totalStyles from "./totals.module.css";
 import { IoMdClose } from "react-icons/io";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import stateData from "@/utils/stateData";
 import Select from "react-select";
 
@@ -13,11 +13,29 @@ const Table = () => {
   const [cart, setCart] = useState([]);
   const [stateSelectedOption, setStateSelectedOption] = useState(null);
   const [changeAddress, setChangeAddress] = useState(false);
+  const [discount, setDiscount] = useState<string>("");
 
   useEffect(() => {
     const localCart = JSON.parse(localStorage.getItem("cart")!) || [];
     setCart(localCart);
   }, []);
+
+  const addDiscount = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const response = await fetch("/api/discounts/use", {
+      method: "PUT",
+      body: JSON.stringify({
+        discount,
+        productId: cart.map((item) => item._id),
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+
+    console.log(data);
+  };
 
   const calcTotalPrice = () => {
     let totalPrice = 0;
@@ -78,8 +96,15 @@ const Table = () => {
         <section>
           <button className={styles.update_btn}> بروزرسانی سبد خرید</button>
           <div>
-            <button className={styles.set_off_btn}>اعمال کوپن</button>
-            <input type="text" placeholder="کد تخفیف" />
+            <button className={styles.set_off_btn} onClick={addDiscount}>
+              اعمال کوپن
+            </button>
+            <input
+              type="text"
+              placeholder="کد تخفیف"
+              value={discount}
+              onChange={(event) => setDiscount(event.target.value)}
+            />
           </div>
         </section>
       </div>
