@@ -1,0 +1,40 @@
+import AdminPanelLayout from "@/components/layouts/AdminPanelLayout";
+import React from "react";
+import styles from "@/styles/p-admin/index.module.css";
+import Box from "@/components/modules/infoBox/InfoBox";
+import dbConnection from "../../../configs/db-connection";
+import TicketModel from "../../../model/Ticket";
+import ProductModel from "../../../model/Product";
+import UserModel from "../../../model/User";
+import SaleChart from "@/components/templates/p-admin/Index/SaleChart";
+import GrowthChart from "@/components/templates/p-admin/Index/GrowthChart";
+const PanelAdmin = async () => {
+  await dbConnection();
+  const tickets = await TicketModel.find({});
+  const products = await ProductModel.find({});
+  const users = await UserModel.find({});
+  return (
+    <AdminPanelLayout>
+      <main>
+        <section className={styles.dashboard_contents}>
+          <Box title="مجموع تیکت های دریافتی" value={tickets.length} />
+          <Box title="مجموع محصولات سایت" value={products.length} />
+          <Box title="مجموع سفارشات" value="333" />
+          <Box title="مجموع کاربر های سایت" value={users.length} />
+        </section>{" "}
+        <div className={styles.dashboard_charts}>
+          <section>
+            <p>آمار فروش</p>
+            <SaleChart />
+          </section>
+          <section>
+            <p>نرخ رشد</p>
+            <GrowthChart />
+          </section>
+        </div>
+      </main>
+    </AdminPanelLayout>
+  );
+};
+
+export default PanelAdmin;

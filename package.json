@@ -9,17 +9,31 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "aos": "^2.3.4",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.2",
+    "leaflet": "^1.9.4",
+    "mongoose": "^8.18.1",
+    "next": "15.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.5.3"
+    "react-icons": "^5.5.0",
+    "react-leaflet": "^5.0.0",
+    "react-select": "^5.10.2",
+    "recharts": "^3.4.1",
+    "sweetalert": "^2.1.2",
+    "sweetalert2": "^11.26.3",
+    "swiper": "^12.0.1"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@types/aos": "^3.0.7",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
-    "@eslint/eslintrc": "^3"
+    "typescript": "^5"
   }
 }
