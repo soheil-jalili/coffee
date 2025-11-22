@@ -1,6 +1,5 @@
 import { FaFacebookF, FaStar, FaTwitter } from "react-icons/fa";
 import { IoCheckmark } from "react-icons/io5";
-import { CiHeart } from "react-icons/ci";
 import { TbSwitch3 } from "react-icons/tb";
 import { FaTelegram, FaLinkedinIn, FaPinterest } from "react-icons/fa";
 import styles from "./details.module.css";
@@ -11,6 +10,7 @@ import AddToWishList from "../wishlist/AddToWishList";
 import { cookies } from "next/headers";
 import userTokenExist from "@/utils/user-token-exist";
 import WhishlistModel from "../../../../model/Whishlist";
+import AddBasket from "./AddBasket";
 
 type Prop = {
   product: {
@@ -71,13 +71,7 @@ const Details = async ({
         <p>موجود در انبار</p>
       </div>
 
-      <div className={styles.cart}>
-        <button>افزودن به سبد خرید</button>
-        <div>
-          <span>-</span>1<span>+</span>
-        </div>
-      </div>
-
+      <AddBasket _id={_id} name={name} price={price} />
       <section className={styles.wishlist}>
         <AddToWishList
           product_id={JSON.parse(JSON.stringify(_id))}
