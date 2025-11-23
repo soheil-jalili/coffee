@@ -15,18 +15,35 @@ const Table = () => {
   const [stateSelectedOption, setStateSelectedOption] = useState(null);
   const [changeAddress, setChangeAddress] = useState(false);
   const [discount, setDiscount] = useState<string>("");
+  const [totalPrice, setTotalPrice] = useState<number>(0);
 
   useEffect(() => {
     const localCart = JSON.parse(localStorage.getItem("cart")!) || [];
     setCart(localCart);
   }, []);
 
+  function calcTotalPrice() {
+    let price = 0;
+
+    if (cart.length) {
+      price = cart.reduce(
+        (prev, current) => prev + current.price * current.count,
+        0
+      );
+      setTotalPrice(price);
+    }
+    setTotalPrice(price);
+  }
+
+  useEffect(() => calcTotalPrice(), [cart]);
+
   const addDiscount = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
+
     const response = await fetch("/api/discounts/use", {
       method: "PUT",
       body: JSON.stringify({
-        discount : discount.trim(),
+        discount: discount.trim(),
         productId: cart.map((item) => item._id),
       }),
       headers: {
@@ -44,22 +61,13 @@ const Table = () => {
 
     if (response.status === 200) {
       const data = await response.json();
-      console.log(data);
+
+      if (data.product === null) {
+        setTotalPrice(totalPrice - (totalPrice * data.percent) / 100);
+      }
+
       return showSwal("کد تخفیف با موفقیت اعمال شد ...", "success", "باشه");
     }
-  };
-
-  const calcTotalPrice = () => {
-    let totalPrice = 0;
-
-    if (cart.length) {
-      totalPrice = cart.reduce(
-        (prev, current) => prev + current.price * current.count,
-        0
-      );
-    }
-
-    return totalPrice;
   };
 
   return (
@@ -161,7 +169,7 @@ const Table = () => {
 
         <div className={totalStyles.total}>
           <p>مجموع</p>
-          <p>{calcTotalPrice().toLocaleString()} تومان</p>
+          <p>{totalPrice.toLocaleString()} تومان</p>
         </div>
         <Link href={"/checkout"}>
           <button className={totalStyles.checkout_btn}>
