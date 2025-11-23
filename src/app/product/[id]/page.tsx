@@ -36,9 +36,7 @@ const product = async ({ params }: Prop) => {
         </div>
         <Tabs
           product={JSON.parse(JSON.stringify(product))}
-          emailLoginUser={
-            user != null ? JSON.parse(JSON.stringify(user.email)) : null
-          }
+          emailLoginUser={user?.email || null}
         />
         <MoreProducts
           relatedProduct={JSON.parse(JSON.stringify(relatedProduct))}

@@ -180,7 +180,11 @@ const Register = ({ showloginForm }: RegisterType) => {
           <p className={styles.redirect_to_home}>لغو</p>
         </div>
       ) : (
-        <Sms hideOtpForm={hideOtpForm} phoneNumber={user.phoneNumber} />
+        <Sms
+          hideOtpForm={hideOtpForm}
+          phoneNumber={user.phoneNumber}
+          name={user.name}
+        />
       )}
     </>
   );
