@@ -10,7 +10,7 @@ export const PUT = async (request: NextRequest) => {
 
     const mainDiscount = await DiscountModel.findOne({ code: discount });
 
-    if (!mainDiscount) {
+    if (!mainDiscount || mainDiscount.enabled === false) {
       return Response.json(
         { message: "This discount code does not exist." },
         { status: 404 }
@@ -41,6 +41,14 @@ export const PUT = async (request: NextRequest) => {
         );
       }
     }
+    await DiscountModel.findOneAndUpdate(
+      { code: discount },
+      {
+        $inc: {
+          uses: 1,
+        },
+      }
+    );
 
     return Response.json(mainDiscount, { status: 200 });
   } catch (error) {

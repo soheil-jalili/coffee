@@ -27,11 +27,12 @@ const Table = () => {
 
     if (cart.length) {
       price = cart.reduce(
-        (prev, current) => prev + current.price * current.count,
+        (prev, current) =>
+          prev + (current.discountedPrice ?? current.price) * current.count,
         0
       );
-      setTotalPrice(price);
     }
+
     setTotalPrice(price);
   }
 
@@ -51,19 +52,41 @@ const Table = () => {
       },
     });
 
-    if (response.status === 404) {
+    if (response.status === 404)
       return showSwal("کد تخفیف یافت نشد", "error", "باشه");
-    } else if (response.status === 410) {
+
+    if (response.status === 410)
       return showSwal("کد تخفیف منقضی شده است", "error", "باشه");
-    } else if (response.status === 422) {
+
+    if (response.status === 422)
       return showSwal("برای محصولات داخل سبد معتبر نیست ...", "error", "باشه");
-    }
 
     if (response.status === 200) {
       const data = await response.json();
 
       if (data.product === null) {
-        setTotalPrice(totalPrice - (totalPrice * data.percent) / 100);
+        const updatedCart = cart.map((item) => ({
+          ...item,
+          discountedPrice: item.price - (item.price * data.percent) / 100,
+        }));
+
+        setCart(updatedCart);
+      }
+
+      else {
+        const discountProductId = String(data.product);
+
+        const updatedCart = cart.map((item) => {
+          if (String(item._id) === discountProductId) {
+            return {
+              ...item,
+              discountedPrice: item.price - (item.price * data.percent) / 100,
+            };
+          }
+          return item;
+        });
+
+        setCart(updatedCart);
       }
 
       return showSwal("کد تخفیف با موفقیت اعمال شد ...", "success", "باشه");
@@ -72,22 +95,28 @@ const Table = () => {
 
   return (
     <>
-      {" "}
       <div className={styles.tabel_container}>
         <table className={styles.table}>
           <thead>
             <tr>
-              <th> جمع جزء</th>
+              <th>جمع جزء</th>
               <th>تعداد</th>
               <th>قیمت</th>
               <th>محصول</th>
               <th></th>
             </tr>
           </thead>
+
           <tbody>
             {cart.map((item) => (
               <tr key={item._id.toString()}>
-                <td>{(item.count * item.price).toLocaleString()} تومان</td>
+                <td>
+                  {(
+                    item.count * (item.discountedPrice ?? item.price)
+                  ).toLocaleString()}{" "}
+                  تومان
+                </td>
+
                 <td className={styles.counter}>
                   <div>
                     <span>-</span>
@@ -95,9 +124,11 @@ const Table = () => {
                     <span>+</span>
                   </div>
                 </td>
+
                 <td className={styles.price}>
-                  {item.price.toLocaleString()} تومان
+                  {(item.discountedPrice ?? item.price).toLocaleString()} تومان
                 </td>
+
                 <td className={styles.product}>
                   <img
                     src="https://set-coffee.com/wp-content/uploads/2020/12/Red-box-DG--430x430.jpg"
@@ -113,12 +144,15 @@ const Table = () => {
             ))}
           </tbody>
         </table>
+
         <section>
-          <button className={styles.update_btn}> بروزرسانی سبد خرید</button>
+          <button className={styles.update_btn}>بروزرسانی سبد خرید</button>
+
           <div>
             <button className={styles.set_off_btn} onClick={addDiscount}>
               اعمال کوپن
             </button>
+
             <input
               type="text"
               placeholder="کد تخفیف"
@@ -128,28 +162,31 @@ const Table = () => {
           </div>
         </section>
       </div>
+
       <div className={totalStyles.totals}>
         <p className={totalStyles.totals_title}>جمع کل سبد خرید</p>
 
         <div className={totalStyles.subtotal}>
           <p>جمع جزء </p>
-          <p>205,000 تومان</p>
+          <p>{totalPrice.toLocaleString()} تومان</p>
         </div>
 
         <p className={totalStyles.motor}>
-          {" "}
-          پیک موتوری: <strong> 30,000 </strong>
+          پیک موتوری: <strong>30,000</strong>
         </p>
+
         <div className={totalStyles.address}>
           <p>حمل و نقل </p>
           <span>حمل و نقل به تهران (فقط شهر تهران).</span>
         </div>
+
         <p
           onClick={() => setChangeAddress((prev) => !prev)}
           className={totalStyles.change_address}
         >
           تغییر آدرس
         </p>
+
         {changeAddress && (
           <div className={totalStyles.address_details}>
             <Select
@@ -161,8 +198,10 @@ const Table = () => {
               isSearchable={true}
               options={stateOptions}
             />
+
             <input type="text" placeholder="شهر" />
             <input type="number" placeholder="کد پستی" />
+
             <button onClick={() => setChangeAddress(false)}>بروزرسانی</button>
           </div>
         )}
@@ -171,6 +210,7 @@ const Table = () => {
           <p>مجموع</p>
           <p>{totalPrice.toLocaleString()} تومان</p>
         </div>
+
         <Link href={"/checkout"}>
           <button className={totalStyles.checkout_btn}>
             ادامه جهت تصویه حساب

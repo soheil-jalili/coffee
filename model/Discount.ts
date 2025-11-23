@@ -31,6 +31,10 @@ const schema = mongoose.Schema(
       required: true,
       ref: "User",
     },
+    enabled : {
+      type : Boolean , 
+      default : false
+    }
   },
   {
     timestamps: true,
