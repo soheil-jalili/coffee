@@ -2,9 +2,10 @@ import styles from "./sms.module.css";
 
 type Prop = {
   hideOtpForm: () => void;
+  phoneNumber: string;
 };
 
-const Sms = ({ hideOtpForm }: Prop) => {
+const Sms = ({ hideOtpForm, phoneNumber }: Prop) => {
   return (
     <>
       <div className={styles.form}>
@@ -12,7 +13,7 @@ const Sms = ({ hideOtpForm }: Prop) => {
         <span className={styles.code_title}>
           لطفاً کد تأیید ارسال شده را تایپ کنید
         </span>
-        <span className={styles.number}>09921558293</span>
+        <span className={styles.number}>{phoneNumber}</span>
         <input className={styles.input} type="text" />
         <button style={{ marginTop: "1rem" }} className={styles.btn}>
           ثبت کد تایید
