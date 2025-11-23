@@ -6,6 +6,7 @@ import { IoMdClose } from "react-icons/io";
 import React, { useEffect, useState } from "react";
 import stateData from "@/utils/stateData";
 import Select from "react-select";
+import { showSwal } from "@/utils/helpers";
 
 const stateOptions = stateData();
 
@@ -25,16 +26,27 @@ const Table = () => {
     const response = await fetch("/api/discounts/use", {
       method: "PUT",
       body: JSON.stringify({
-        discount,
+        discount : discount.trim(),
         productId: cart.map((item) => item._id),
       }),
       headers: {
         "Content-Type": "application/json",
       },
     });
-    const data = await response.json();
 
-    console.log(data);
+    if (response.status === 404) {
+      return showSwal("کد تخفیف یافت نشد", "error", "باشه");
+    } else if (response.status === 410) {
+      return showSwal("کد تخفیف منقضی شده است", "error", "باشه");
+    } else if (response.status === 422) {
+      return showSwal("برای محصولات داخل سبد معتبر نیست ...", "error", "باشه");
+    }
+
+    if (response.status === 200) {
+      const data = await response.json();
+      console.log(data);
+      return showSwal("کد تخفیف با موفقیت اعمال شد ...", "success", "باشه");
+    }
   };
 
   const calcTotalPrice = () => {

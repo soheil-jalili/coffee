@@ -13,7 +13,14 @@ export const PUT = async (request: NextRequest) => {
     if (!mainDiscount) {
       return Response.json(
         { message: "This discount code does not exist." },
-        { status: 422 }
+        { status: 404 }
+      );
+    }
+
+    if (mainDiscount.uses === mainDiscount.maxUse) {
+      return Response.json(
+        { message: "The Code is expired ..." },
+        { status: 410 }
       );
     }
 
@@ -35,7 +42,7 @@ export const PUT = async (request: NextRequest) => {
       }
     }
 
-    return Response.json(mainDiscount);
+    return Response.json(mainDiscount, { status: 200 });
   } catch (error) {
     console.log("ERROR IN USE API DISCOUNT => ", error);
     return Response.json({ message: error.message }, { status: 500 });
