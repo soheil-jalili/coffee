@@ -1,7 +1,7 @@
 "use client";
 import { IoMdStar } from "react-icons/io";
 import styles from "./commentForm.module.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { showSwal } from "@/utils/helpers";
 import { validateEmail } from "@/utils/auth";
 import { useRouter } from "next/navigation";
@@ -14,10 +14,11 @@ const CommentForm = ({
 }) => {
   const [userRate, setUserRate] = useState<number>(1);
   const [hoverRate, setHoverRate] = useState(1);
+  const [remember, setRemember] = useState<boolean>(false);
 
   const [input, setInput] = useState<{
     username: string;
-    body: string;
+    body?: string;
     email: string;
   }>({
     username: "",
@@ -33,7 +34,7 @@ const CommentForm = ({
   };
   const router = useRouter();
   const submitComment = async () => {
-    if (!input.body.trim() || !input.email.trim() || !input.username.trim()) {
+    if (!input.body!.trim() || !input.email.trim() || !input.username.trim()) {
       return showSwal("مقادیر با دقت پر کنید", "error", "باشه");
     }
     const isValidEmail = validateEmail(input.email);
@@ -75,6 +76,38 @@ const CommentForm = ({
       email: input.email,
     });
   };
+
+  const checkboxHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = event.target.checked;
+    setRemember(checked);
+    if (event.target.checked) {
+      localStorage.setItem(
+        "comment-form-product-id",
+        JSON.stringify({
+          email: emailLoginUser || input.email,
+          username: input.username,
+        })
+      );
+    } else {
+      localStorage.removeItem("comment-form-product-id");
+    }
+  };
+
+  useEffect(() => {
+    const saved = localStorage.getItem("comment-form-product-id");
+    setRemember(Boolean(saved));
+  }, []);
+
+  useEffect(() => {
+    const user = JSON.parse(
+      localStorage.getItem("comment-form-product-id") || "{}"
+    );
+
+    setInput({
+      email: emailLoginUser || user.email || "",
+      username: user.username || "",
+    });
+  }, [emailLoginUser]);
 
   return (
     <div className={styles.form}>
@@ -146,7 +179,8 @@ const CommentForm = ({
         </div>
       </div>
       <div className={styles.checkbox}>
-        <input type="checkbox" name="" id="" />
+        <input type="checkbox" checked={remember} onChange={checkboxHandler} />
+
         <p>
           {" "}
           ذخیره نام، ایمیل و وبسایت من در مرورگر برای زمانی که دوباره دیدگاهی
