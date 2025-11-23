@@ -14,7 +14,7 @@ type Prop = {
 const Sms = ({ hideOtpForm, phoneNumber, name, email }: Prop) => {
   const [code, setCode] = useState<string>("");
   const router = useRouter();
-  const registerWithOtp = async () => {
+  const   registerWithOtp = async () => {
     const response = await fetch("/api/auth/sms/verify", {
       method: "POST",
       headers: {

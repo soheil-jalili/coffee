@@ -56,7 +56,7 @@ export const GET = async (request: NextRequest) => {
 
     const { name } = verifyToken(token) as { name: string };
     const user = await UserModel.findOne({ name });
-    if (!user && user.role !== "ADMIN") {
+    if (!user || user.role !== "ADMIN") {
       return Response.json({ message: "Access Denied" }, { status: 403 });
     }
 

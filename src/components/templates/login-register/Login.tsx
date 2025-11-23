@@ -3,9 +3,10 @@ import styles from "./login.module.css";
 import Link from "next/link";
 import Sms from "./Sms";
 import { showSwal } from "@/utils/helpers";
-import { validateEmail, validatePassword } from "@/utils/auth";
+import { validateEmail, validatePassword, validatePhone } from "@/utils/auth";
 import { redirect, RedirectType } from "next/navigation";
 import { useRouter } from "next/navigation";
+import SmsLogin from "./SmsLogin";
 
 type LoginType = {
   showRegisterForm: () => void;
@@ -79,6 +80,43 @@ const Login = ({ showRegisterForm }: LoginType) => {
     }
   };
 
+  const loginWithOtp = async () => {
+    const isValidPhone = validatePhone(user.phoneOrEmail);
+    if (!isValidPhone) {
+      return showSwal("لطفا شماره موبایل معتبر وارد کنید", "error", "باشه");
+    }
+
+    try {
+      const response = await fetch("/api/auth/sms/login", {
+        method: "POST",
+        body: JSON.stringify({ phoneNumber: user.phoneOrEmail }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await response.json();
+
+      switch (response.status) {
+        case 200:
+          await showSwal("کد یکبار مصرف ارسال شد", "success", "باشه");
+          setIsLoginWithOtp(true);
+          break;
+        case 422:
+          showSwal("شماره موبایل وارد نشده یا معتبر نیست", "error", "باشه");
+          break;
+        case 404:
+          showSwal("شماره موبایل موجود نیست", "error", "باشه");
+          break;
+        case 500:
+          showSwal("خطای سرور، دوباره تلاش کنید", "error", "باشه");
+          break;
+        default:
+          showSwal(data.message || "خطای ناشناخته", "error", "باشه");
+      }
+    } catch (error: any) {
+      showSwal(error.message || "خطا در ارتباط با سرور", "error", "باشه");
+    }
+  };
+
   return (
     <>
       {!isLoginWithOtp ? (
@@ -110,10 +148,7 @@ const Login = ({ showRegisterForm }: LoginType) => {
             <Link href={"/forget-password"} className={styles.forgot_pass}>
               رمز عبور را فراموش کرده اید؟
             </Link>
-            <button
-              className={styles.btn}
-              onClick={() => setIsLoginWithOtp(true)}
-            >
+            <button className={styles.btn} onClick={loginWithOtp}>
               ورود با کد یکبار مصرف
             </button>
             <span>ایا حساب کاربری ندارید؟</span>
@@ -126,7 +161,7 @@ const Login = ({ showRegisterForm }: LoginType) => {
           </Link>
         </>
       ) : (
-        <Sms hideOtpForm={hideOtpForm} />
+        <SmsLogin hideOtpForm={hideOtpForm} phoneNumber={user.phoneOrEmail} />
       )}
     </>
   );
