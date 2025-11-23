@@ -8,9 +8,10 @@ type Prop = {
   hideOtpForm: () => void;
   phoneNumber: string;
   name: string;
+  email: string;
 };
 
-const Sms = ({ hideOtpForm, phoneNumber, name }: Prop) => {
+const Sms = ({ hideOtpForm, phoneNumber, name, email }: Prop) => {
   const [code, setCode] = useState<string>("");
   const router = useRouter();
   const registerWithOtp = async () => {
@@ -23,15 +24,17 @@ const Sms = ({ hideOtpForm, phoneNumber, name }: Prop) => {
         name: name.trim(),
         phoneNumber: phoneNumber.trim(),
         code: code.trim(),
+        email: email.trim(),
       }),
     });
 
-    if (response.status === 422) {
+    const { message } = await response.json();
+    if (response.status === 409) {
+      return showSwal("کد شما معتبر نیست", "error", "تلاش مجدد");
+    } else if (response.status === 422) {
       return showSwal("شماره موبایل شما معتبر نیست", "error", "تلاش مجدد");
     } else if (response.status === 404) {
       return showSwal("شماره موبایل شما معتبر نیست", "error", "تلاش مجدد");
-    } else if (response.status === 400) {
-      return showSwal("کد شما معتبر نیست", "error", "تلاش مجدد");
     } else if (response.status === 410) {
       return showSwal("کد شما منقضی شده است", "error", "تلاش مجدد");
     }

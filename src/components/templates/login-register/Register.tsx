@@ -102,22 +102,38 @@ const Register = ({ showloginForm }: RegisterType) => {
     }
     const response = await fetch("/api/auth/sms/send", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         phoneNumber: user.phoneNumber,
+        email: user.email,
       }),
     });
-    if (response.status === 409) {
-      return showSwal("این شماره تلفن قبلا ثبت شده است", "error", "باشه");
+
+    const { message } = await response.json();
+
+    if (response.status === 409 && message === "Email exist ...") {
+      return showSwal("این ایمیل قبلاً ثبت شده", "error", "باشه");
     }
 
-    if (response.status === 201) {
-      return showSwal("کد ورود با موفقیت ارسال شد", "success", "باشه").then(
-        () => registerWithOtp()
+    if (response.status === 409) {
+      return showSwal("این شماره قبلاً ثبت شده", "error", "باشه").then(
+        (res) => {
+          showloginForm();
+        }
       );
     }
+
+    if (response.status === 422) {
+      return showSwal("شماره معتبر نیست", "error", "باشه");
+    }
+
+    if (response.status !== 201) {
+      return showSwal("خطا در ارسال کد", "error", "باشه");
+    }
+
+    return showSwal("کد ورود با موفقیت ارسال شد", "success", "باشه").then(() =>
+      registerWithOtp()
+    );
   };
   return (
     <>
@@ -184,6 +200,7 @@ const Register = ({ showloginForm }: RegisterType) => {
           hideOtpForm={hideOtpForm}
           phoneNumber={user.phoneNumber}
           name={user.name}
+          email={user.email!}
         />
       )}
     </>

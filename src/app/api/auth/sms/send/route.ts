@@ -8,10 +8,17 @@ const request = require("request");
 export async function POST(req: NextRequest) {
   connectToDB();
   const body = await req.json();
-  const { phoneNumber } = body;
+  const { phoneNumber, email } = body;
+
+  if (email) {
+    const isEmailExist = await UserModel.findOne({ email });
+
+    if (isEmailExist) {
+      return Response.json({ message: "Email exist ..." }, { status: 409 });
+    }
+  }
 
   const user = await UserModel.findOne({ phoneNumber });
-
   if (user) {
     return Response.json(
       { message: "این شماره تلفن قبلاً ثبت شده است" },

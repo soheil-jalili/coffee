@@ -11,7 +11,7 @@ import UserModel from "../../../../../../model/User";
 export const POST = async (request: NextRequest) => {
   try {
     await dbConnection();
-    const { phoneNumber, code, name } = await request.json();
+    const { phoneNumber, code, name, email } = await request.json();
 
     const isValidPhoneNumber = validatePhone(phoneNumber);
     if (!isValidPhoneNumber) {
@@ -21,37 +21,33 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    const userPhoneNumberExist = await OtpModel.findOne({ phoneNumber, code });
-
-    if (!userPhoneNumberExist) {
+    const otpDoc = await OtpModel.findOne({ phoneNumber });
+    if (!otpDoc) {
       return Response.json(
         { message: "phone number does not exist" },
         { status: 404 }
       );
     }
 
-    if (userPhoneNumberExist.code !== code) {
+    if (otpDoc.code !== code) {
       return Response.json({ message: "code is not correct" }, { status: 409 });
     }
 
-    const date = new Date();
-    const now = date.getTime();
-
-    if (!(userPhoneNumberExist.expTime > now)) {
+    const now = Date.now();
+    if (otpDoc.expTime <= now) {
       return Response.json({ message: "code is expired" }, { status: 410 });
     }
 
-    const accessToken = generateAccessToken({
-      name,
-    });
-    const refreshToken = generateRefreshToken({
-      name,
-    });
+    const accessToken = generateAccessToken({ name });
+    const refreshToken = generateRefreshToken({ name });
 
+    const users = await UserModel.find({});
     await UserModel.create({
       name,
-      phoneNumber: userPhoneNumberExist.phoneNumber,
+      phoneNumber: otpDoc.phoneNumber,
       refreshToken,
+      email: email ? email : `${phoneNumber}@gmail.com`,
+      role: users.length === 0 ? "ADMIN" : "USER",
     });
 
     return Response.json(
