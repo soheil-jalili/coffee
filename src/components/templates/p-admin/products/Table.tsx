@@ -63,7 +63,7 @@ export default function DataTable({
               <tr key={product._id.toString()}>
                 <td>{index + 1}</td>
                 <td>{product.name}</td>
-                <td>{product.price}</td>
+                <td>{product.price.toLocaleString()}</td>
                 <td>{product.score}</td>
                 <td>{product.comments.length}</td>
                 <td>

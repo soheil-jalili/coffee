@@ -2,8 +2,8 @@ import AdminPanelLayout from "@/components/layouts/AdminPanelLayout";
 import React from "react";
 import dbConnection from "../../../../configs/db-connection";
 import ProductModel from "../../../../model/Product";
-import Table from '@/components/templates/p-admin/products/Table'
-import styles from '@/components/templates/p-admin/products/table.module.css'
+import Table from "@/components/templates/p-admin/products/Table";
+import styles from "@/components/templates/p-admin/products/table.module.css";
 
 const ProductsAdminPanel: React.FC = async () => {
   await dbConnection();
@@ -20,8 +20,6 @@ const ProductsAdminPanel: React.FC = async () => {
           />
         )}
       </main>
-
-      
     </AdminPanelLayout>
   );
 };

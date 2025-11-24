@@ -1,18 +1,20 @@
+"use client";
 import styles from "./footer.module.css";
 import { MdOutlineCopyright } from "react-icons/md";
 
 import { FaRegHeart } from "react-icons/fa";
 import Article from "./Article";
 import Link from "next/link";
-import { headers } from "next/headers";
-const Footer = async () => {
-  const heads = headers();
-  const pathname = (await heads).get("pathname");
+import { usePathname } from "next/navigation";
+const Footer = () => {
+  const pathname = usePathname();
+  const isPanelUserRoute =
+    pathname.startsWith("/p-user") || pathname.startsWith("/p-admin");
 
   return (
     <footer
       className={styles.footer}
-      style={{ display: pathname !== "/" ? "none" : "" }}
+      style={{ display: isPanelUserRoute ? "none" : "" }}
     >
       <main className="container">
         <section className={styles.descriptions}>

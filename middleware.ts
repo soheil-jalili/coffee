@@ -1,10 +1,5 @@
+import { verifyToken } from "@/utils/auth";
 import { NextResponse, NextRequest } from "next/server";
-import { verifyToken } from "./utils/auth";
-import connectToDB from "./configs/connect_Db";
-import UserModel from "../model/User";
-import { authUser } from "./utils/server-helper";
-import userTokenExist from "./utils/user-token-exist";
-import { cookies } from "next/headers";
 
 // export async function middleware(request: NextRequest) {
 //   const token = request.cookies.get("token");
