@@ -8,7 +8,10 @@ import ProductModel from "../../../../../model/Product";
 import RelatedProduct from "@/types/related-product";
 const Latest: React.FC = async () => {
   dbConnection();
-  const products = await ProductModel.find({}).populate("comments").lean();
+  const products = await ProductModel.find({})
+    .populate("comments")
+    .lean()
+    .limit(8);
 
   return (
     <div className={styles.container}>

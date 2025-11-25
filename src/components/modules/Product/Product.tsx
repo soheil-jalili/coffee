@@ -10,13 +10,17 @@ const Product: React.FC<RelatedProduct> = ({
   name,
   price,
   comments,
+  img,
   _id,
 }: RelatedProduct) => {
   return (
     <div className={styles.card}>
       <div className={styles.details_container}>
         <img
-          src="https://set-coffee.com/wp-content/uploads/2021/10/041-430x430.png"
+          src={
+            img ||
+            "https://upload.wikimedia.org/wikipedia/commons/a/a3/Image-not-found.png"
+          }
           alt=""
         />
         <div className={styles.icons}>
