@@ -3,6 +3,8 @@ import dbConnection from "../../../../configs/db-connection";
 import ProductModel from "../../../../model/Product";
 import { verifyToken } from "@/utils/auth";
 import UserModel from "../../../../model/User";
+import fs from "fs";
+import path from "path";
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -79,3 +81,25 @@ export const GET = async (request: NextRequest) => {
   }
 };
 
+export const PUT = async (request: NextRequest) => {
+  const formData = await request.formData();
+  const img = formData.get("img");
+
+  if (!(img instanceof File)) {
+    return Response.json({ message: "product has not image" }, { status: 400 });
+  }
+
+  try {
+    // buffer
+    const buffer = Buffer.from(await img.arrayBuffer());
+    const fileName = Date.now() + img.name;
+
+    await fs.promises.writeFile(
+      path.join(process.cwd(), "public/uploads/" + fileName),
+      buffer
+    );
+  } catch (error) {
+    return Response.json({ message: error.message }, { status: 500 });
+  }
+  return Response.json({ message: "file uploaded" }, { status: 201 });
+};
