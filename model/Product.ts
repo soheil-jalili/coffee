@@ -47,6 +47,11 @@ const schema = mongoose.Schema({
     type: [String],
     required: true,
   },
+
+  img: {
+    type: String,
+    required: true,
+  },
 });
 
 const ProductModel =

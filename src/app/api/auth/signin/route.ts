@@ -24,6 +24,7 @@ export const POST = async (request: NextRequest) => {
     }
 
     const user = await UserModel.findOne({ email: email });
+
     if (!user) {
       return Response.json(
         { message: "یوزرنیم با این مشخصات وجود ندارد" },

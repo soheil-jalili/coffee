@@ -2,9 +2,9 @@ import { NextRequest } from "next/server";
 import dbConnection from "../../../../configs/db-connection";
 import ProductModel from "../../../../model/Product";
 import { verifyToken } from "@/utils/auth";
-import UserModel from "../../../../model/User";
 import fs from "fs";
 import path from "path";
+import UserModel from "../../../../model/User";
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -22,16 +22,34 @@ export const POST = async (request: NextRequest) => {
       return Response.json({ message: "Access denied" }, { status: 403 });
     }
 
-    const {
-      name,
-      price,
-      shortDescription,
-      longDescription,
-      weight,
-      suitableFor,
-      smell,
-      tags,
-    } = await request.json();
+    const formData = await request.formData();
+    const name = formData.get("name");
+    const price = formData.get("price");
+    const shortDescription = formData.get("shortDescription");
+    const longDescription = formData.get("longDescription");
+    const weight = formData.get("weight");
+    const suitableFor = formData.get("suitableFor");
+    const smell = formData.get("smell");
+    const tags = JSON.parse(formData.get("tags"));
+    const image = formData.get("img");
+
+    if (!(image instanceof File)) {
+      return Response.json({ message: "has not image" }, { status: 400 });
+    }
+
+    const buffer = Buffer.from(await image.arrayBuffer());
+    const newNameImage =
+      Date.now() +
+      image.name
+        .trim()
+        .replace(/\s+/g, "-") 
+        .replace(/[^\w.-]/g, "");
+        
+    const imagePath = path.join(
+      process.cwd(),
+      "public/uploads/" + newNameImage
+    );
+    await fs.promises.writeFile(imagePath, buffer);
 
     const product = await ProductModel.create({
       name,
@@ -42,6 +60,7 @@ export const POST = async (request: NextRequest) => {
       suitableFor,
       smell,
       tags,
+      img: `http://localhost:3000/uploads/${newNameImage}`,
     });
 
     return Response.json(
@@ -50,9 +69,10 @@ export const POST = async (request: NextRequest) => {
     );
   } catch (error) {
     console.log("Error in add product ->", error);
-    return Response.json({ message: "Internal Server Error" }, { status: 500 });
+    return Response.json({ message: error.message }, { status: 500 });
   }
 };
+
 export const GET = async (request: NextRequest) => {
   try {
     dbConnection();
