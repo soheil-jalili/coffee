@@ -124,7 +124,9 @@ export default function DataTable({
                 <td>{comment.username}</td>
                 <td>{comment.email}</td>
                 <td>{comment.rate}</td>
-                <td>{comment.productId!.name}</td>
+                <td>
+                  {comment.productId?.name || "پاک شده است"}
+                </td>
                 <td>{new Date(comment.date).toLocaleDateString("fa-IR")}</td>
                 <td>
                   <button

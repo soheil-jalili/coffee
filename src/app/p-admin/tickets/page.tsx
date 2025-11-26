@@ -10,7 +10,8 @@ const TicketAdminPanel: React.FC = async () => {
   const tickets = await TicketModel.find({ isAnswer: false })
     .populate("department")
     .populate("user")
-    .sort({ _id: -1 });
+    .sort({ priority: 1, _id: -1 });
+
   return (
     <AdminPanelLayout>
       <main>
