@@ -1,12 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styles from "../table.module.css";
-import swal from "sweetalert";
 import { useRouter } from "next/navigation";
 import { showSwal } from "@/utils/helpers";
 
 function AddProduct() {
   const router = useRouter();
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const [input, setInput] = useState<{
     name: string;
@@ -38,22 +38,48 @@ function AddProduct() {
       return;
     }
 
-    setInput((prev) => ({ ...prev, [name]: value }));
+    setInput((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const addProduct = async () => {
+    if (!input.name.trim())
+      return showSwal("لطفا نام محصول را وارد کنید", "error", "باشه");
+    if (!input.price.trim() || isNaN(Number(input.price)))
+      return showSwal("لطفا قیمت معتبر وارد کنید", "error", "باشه");
+    if (!input.shortDescription.trim())
+      return showSwal("لطفا توضیح کوتاه محصول را وارد کنید", "error", "باشه");
+    if (!input.longDescription.trim())
+      return showSwal("لطفا توضیح بلند محصول را وارد کنید", "error", "باشه");
+    if (!input.weight.trim() || isNaN(Number(input.weight)))
+      return showSwal("لطفا وزن معتبر وارد کنید", "error", "باشه");
+    if (!input.suitableFor.trim())
+      return showSwal("لطفا مناسب برای را وارد کنید", "error", "باشه");
+    if (!input.smell.trim())
+      return showSwal("لطفا نوع عطر را وارد کنید", "error", "باشه");
+    if (!input.tags.trim())
+      return showSwal("لطفا تگ‌ها را وارد کنید", "error", "باشه");
+    if (!(input.img instanceof File))
+      return showSwal("لطفا یک تصویر انتخاب کنید", "error", "باشه");
+
     const formData = new FormData();
     formData.append("name", input.name);
-    formData.append("price", input.price);
+    formData.append("price", input.price.toString());
     formData.append("shortDescription", input.shortDescription);
     formData.append("longDescription", input.longDescription);
     formData.append("weight", input.weight);
     formData.append("suitableFor", input.suitableFor);
     formData.append("smell", input.smell);
-    formData.append("tags", input.tags);
-    if (input.img) {
-      formData.append("img", input.img); 
-    }
+
+    input.tags
+      .split(/[,،]/)
+      .map((t) => t.trim())
+      .filter((t) => t)
+      .forEach((tag) => formData.append("tags", tag));
+
+    formData.append("img", input.img);
 
     const response = await fetch("/api/products", {
       method: "POST",
@@ -61,8 +87,20 @@ function AddProduct() {
     });
 
     if (response.status === 201) {
-      return showSwal("محصول با موفقیت اضافه شد", "success", "باشه").then(_=>{
-        router.refresh()
+      showSwal("محصول با موفقیت اضافه شد", "success", "باشه").then(() => {
+        router.refresh();
+        setInput({
+          name: "",
+          price: "",
+          shortDescription: "",
+          longDescription: "",
+          weight: "",
+          suitableFor: "",
+          smell: "",
+          tags: "",
+          img: null,
+        });
+        if (fileRef.current) fileRef.current.value = "";
       });
     }
   };
@@ -91,7 +129,6 @@ function AddProduct() {
             onChange={inputOnChange}
           />
         </div>
-
         <div>
           <label>توضیحات کوتاه</label>
           <input
@@ -117,9 +154,9 @@ function AddProduct() {
           <input
             placeholder="وزن محصول"
             type="text"
-            onChange={inputOnChange}
             name="weight"
             value={input.weight}
+            onChange={inputOnChange}
           />
         </div>
         <div>
@@ -137,9 +174,9 @@ function AddProduct() {
           <input
             placeholder="میزان بو"
             type="text"
-            onChange={inputOnChange}
             name="smell"
             value={input.smell}
+            onChange={inputOnChange}
           />
         </div>
         <div>
@@ -154,7 +191,7 @@ function AddProduct() {
         </div>
         <div>
           <label>تصویر محصول</label>
-          <input type="file" onChange={inputOnChange} />
+          <input type="file" ref={fileRef} onChange={inputOnChange} />
         </div>
       </div>
       <button onClick={addProduct}>افزودن</button>

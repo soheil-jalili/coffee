@@ -31,7 +31,7 @@ export const POST = async (request: NextRequest) => {
     const suitableFor = formData.get("suitableFor");
     const smell = formData.get("smell");
     // const tags = JSON.parse(formData.get("tags")); // for postman
-    const tags = formData.get("tags");
+    const tags = formData.getAll("tags");
     const image = formData.get("img");
 
     if (!(image instanceof File)) {
