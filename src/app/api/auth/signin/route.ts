@@ -49,13 +49,19 @@ export const POST = async (request: NextRequest) => {
         $set: { refreshToken },
       }
     );
+
+    const headers = new Headers();
+    headers.append("Set-Cookie", `token=${accessToken};path=/;httpOnly=true`);
+    headers.append(
+      "Set-Cookie",
+      `refresh-token=${refreshToken};path=/;httpOnly=true`
+    );
+
     return Response.json(
       { message: "لاگین با موفقیت انجام شد" },
       {
         status: 200,
-        headers: {
-          "Set-Cookie": `token=${accessToken};path=/;httpOnly=true`,
-        },
+        headers,
       }
     );
   } catch (error) {

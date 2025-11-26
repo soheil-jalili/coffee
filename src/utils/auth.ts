@@ -14,7 +14,7 @@ export const verifyPassword = async (
 
 export const generateAccessToken = (payload: { name: string }) => {
   return sign({ ...payload }, process.env.ACCESS_TOKEN_SECRET_KEY!, {
-    expiresIn: "60d",
+    expiresIn: "60s",
   });
 };
 
