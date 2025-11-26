@@ -44,7 +44,7 @@ export const POST = async (request: NextRequest) => {
         .trim()
         .replace(/\s+/g, "-") 
         .replace(/[^\w.-]/g, "");
-        
+
     const imagePath = path.join(
       process.cwd(),
       "public/uploads/" + newNameImage
