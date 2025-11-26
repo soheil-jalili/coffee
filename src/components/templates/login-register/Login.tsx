@@ -63,6 +63,7 @@ const Login = ({ showRegisterForm }: LoginType) => {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
     });
 
     const { message } = await response.json();

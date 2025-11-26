@@ -45,7 +45,7 @@ export const DELETE = async (request: NextRequest) => {
     await UserModel.findOneAndDelete({ _id: userChange._id });
 
     return Response.json({ message: "User Delete !" }, { status: 200 });
-  } catch (error) {
+  } catch (error : any) {
     console.log(`User API DELETE Error => `, error);
     return Response.json({ message: error.message }, { status: 500 });
   }

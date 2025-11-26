@@ -42,7 +42,7 @@ export const PUT = async (request: NextRequest) => {
       { name: username, email }
     );
     return Response.json({ message: "User update !" }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     console.log(`User API Update Error => `, error);
     return Response.json({ message: error.message }, { status: 500 });
   }
