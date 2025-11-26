@@ -68,7 +68,7 @@ export const POST = async (request: NextRequest) => {
       { message: "Product add successfully ...", data: product },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.log("Error in add product ->", error);
     return Response.json({ message: error.message }, { status: 500 });
   }
@@ -119,7 +119,7 @@ export const PUT = async (request: NextRequest) => {
       path.join(process.cwd(), "public/uploads/" + fileName),
       buffer
     );
-  } catch (error) {
+  } catch (error: any) {
     return Response.json({ message: error.message }, { status: 500 });
   }
   return Response.json({ message: "file uploaded" }, { status: 201 });
