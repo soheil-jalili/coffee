@@ -30,7 +30,8 @@ export const POST = async (request: NextRequest) => {
     const weight = formData.get("weight");
     const suitableFor = formData.get("suitableFor");
     const smell = formData.get("smell");
-    const tags = JSON.parse(formData.get("tags"));
+    // const tags = JSON.parse(formData.get("tags")); // for postman
+    const tags = formData.get("tags");
     const image = formData.get("img");
 
     if (!(image instanceof File)) {
@@ -42,7 +43,7 @@ export const POST = async (request: NextRequest) => {
       Date.now() +
       image.name
         .trim()
-        .replace(/\s+/g, "-") 
+        .replace(/\s+/g, "-")
         .replace(/[^\w.-]/g, "");
 
     const imagePath = path.join(

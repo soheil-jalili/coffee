@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import styles from "../table.module.css";
 import swal from "sweetalert";
 import { useRouter } from "next/navigation";
+import { showSwal } from "@/utils/helpers";
 
 function AddProduct() {
   const router = useRouter();
@@ -16,7 +17,7 @@ function AddProduct() {
     suitableFor: string;
     smell: string;
     tags: string;
-    // img: string;
+    img: File | null;
   }>({
     name: "",
     price: "",
@@ -26,21 +27,44 @@ function AddProduct() {
     suitableFor: "",
     smell: "",
     tags: "",
+    img: null,
   });
 
   const inputOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setInput((prevInput) => ({ ...prevInput, [name]: value }));
+    const { name, value, files } = event.target;
+
+    if (files && files.length > 0) {
+      setInput((prev) => ({ ...prev, img: files[0] }));
+      return;
+    }
+
+    setInput((prev) => ({ ...prev, [name]: value }));
   };
 
   const addProduct = async () => {
+    const formData = new FormData();
+    formData.append("name", input.name);
+    formData.append("price", input.price);
+    formData.append("shortDescription", input.shortDescription);
+    formData.append("longDescription", input.longDescription);
+    formData.append("weight", input.weight);
+    formData.append("suitableFor", input.suitableFor);
+    formData.append("smell", input.smell);
+    formData.append("tags", input.tags);
+    if (input.img) {
+      formData.append("img", input.img); 
+    }
+
     const response = await fetch("/api/products", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(input),
+      body: formData,
     });
+
+    if (response.status === 201) {
+      return showSwal("محصول با موفقیت اضافه شد", "success", "باشه").then(_=>{
+        router.refresh()
+      });
+    }
   };
 
   return (
@@ -130,7 +154,7 @@ function AddProduct() {
         </div>
         <div>
           <label>تصویر محصول</label>
-          <input type="file" />
+          <input type="file" onChange={inputOnChange} />
         </div>
       </div>
       <button onClick={addProduct}>افزودن</button>
