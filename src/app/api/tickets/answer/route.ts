@@ -51,7 +51,7 @@ export const POST = async (request: NextRequest) => {
     );
 
     return Response.json({ message: "answer created" }, { status: 201 });
-  } catch (error) {
+  } catch (error : any) {
     console.log("Error in Answer API => ", error);
     return Response.json({ message: error.message }, { status: 500 });
   }
